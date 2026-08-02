@@ -83,6 +83,7 @@ let happyData = {
     completed: false
 };
 
+let isSaving = false;
 
 /* ===================================
    初期処理
@@ -658,16 +659,12 @@ window.addEventListener("DOMContentLoaded", ()=>{
 
 async function saveResult(bonus){
 
-    if(!happyData.task){
-
-        setMessage(
-            "タスクがありません"
-        );
-
+    if(isSaving){
         return;
-
     }
 
+    isSaving = true;
+    
 
     completeButton.disabled = true;
 
