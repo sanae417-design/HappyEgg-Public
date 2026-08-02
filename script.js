@@ -524,6 +524,51 @@ async function getSummary(){
 }
 
 /* ===================================
+   Statusシート更新
+=================================== */
+
+async function updateStatus(data){
+
+    const formData =
+        new URLSearchParams();
+
+
+    formData.append(
+        "action",
+        "updateStatus"
+    );
+
+
+    formData.append(
+        "data",
+        JSON.stringify(data)
+    );
+
+
+    const response =
+        await fetch(
+            GAS_URL,
+            {
+                method:"POST",
+                body:formData
+            }
+        );
+
+
+    if(!response.ok){
+
+        throw new Error(
+            "Status Update Error"
+        );
+
+    }
+
+
+    return await response.json();
+
+}
+
+/* ===================================
    成長ステータス更新
 =================================== */
 
@@ -719,6 +764,8 @@ async function saveResult(bonus){
 
         });
 
+        appStatus.currentTask = "";
+        appStatus.category = "";
 
         updateMeter();
 
@@ -786,7 +833,11 @@ async function saveResult(bonus){
         completeButton.disabled = false;
         bonusButton.disabled = false;
     }
-
+    else{
+        completeButton.disabled = true;
+        bonusButton.disabled = true;
+    }
+    
 
 }
 
