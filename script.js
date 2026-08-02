@@ -88,30 +88,24 @@ let happyData = {
    初期処理
 =================================== */
 
-window.addEventListener("DOMContentLoaded", async ()=>{
+window.addEventListener("DOMContentLoaded", async()=>{
 
     loadData();
 
     resetIfNewDay();
 
-    updateMeter();
-
     restoreTask();
 
     setupCommentChip();
-
 
     try{
 
         const summary =
             await getSummary();
 
-
         todaySummary = summary;
 
-
         updateMeter();
-
 
         updateGrowth(summary);
 
@@ -119,6 +113,9 @@ window.addEventListener("DOMContentLoaded", async ()=>{
     catch(error){
 
         console.error(error);
+
+        // GASが取得できない時だけLocalStorageを使う
+        updateMeter();
 
     }
 
