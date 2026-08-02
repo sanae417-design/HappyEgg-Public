@@ -1,7 +1,7 @@
 
 // 初回起動
-// LocalStorage読込
-// 日付が変わったら0回へリセット
+// Statusシート取得
+// 日付が変わったら更新（日付、過去のタスククリア、0回へリセット）
 // たまごメーター更新
 // GASからランダム取得
 // リロードしても同じタスクを表示
@@ -19,7 +19,6 @@
 =================================== */
 
 const MAX_COUNT = 3;
-const STORAGE_KEY = "happyEggData";
 
 
 /* ===================================
@@ -66,22 +65,11 @@ const nextLevel =
 /* ===================================
    当日データ
 =================================== */
-let todaySummary = {
-    todayComplete: 0,
-    todayBonus: 0
-};
+let appStatus = {};
 
 /* ===================================
    アプリデータ
 =================================== */
-
-let happyData = {
-    date: "",
-    count: 0,
-    task: null,
-    category: null,
-    completed: false
-};
 
 let isSaving = false;
 
@@ -91,33 +79,38 @@ let isSaving = false;
 
 window.addEventListener("DOMContentLoaded", async()=>{
 
-    loadData();
-
-    resetIfNewDay();
-
-    restoreTask();
 
     setupCommentChip();
+
 
     try{
 
         const summary =
             await getSummary();
 
+
         console.log(summary);
-        
-        todaySummary = summary;
+
+
+        appStatus = summary;
+
+
+        await checkTodayStatus();
+
+
+        restoreTask(appStatus);
+
 
         updateMeter();
 
-        updateGrowth(summary);
+        updateGrowth(appStatus);
+
 
     }
     catch(error){
 
         console.error(error);
 
-        // GASが取得できない時だけLocalStorageを使う
         updateMeter();
 
     }
@@ -126,60 +119,70 @@ window.addEventListener("DOMContentLoaded", async()=>{
 
 
 /* ===================================
-   LocalStorage
-=================================== */
-
-function loadData(){
-
-    const saved = localStorage.getItem(STORAGE_KEY);
-
-    if(saved){
-        happyData = JSON.parse(saved);
-    }
-
-}
-
-
-function saveData(){
-
-    localStorage.setItem(
-        STORAGE_KEY,
-        JSON.stringify(happyData)
-    );
-
-}
-
-
-/* ===================================
    日付処理
 =================================== */
 
 function getToday(){
 
-    return new Date()
-        .toISOString()
-        .slice(0,10);
+    const d = new Date();
+
+    const yyyy =
+        d.getFullYear();
+
+    const mm =
+        String(d.getMonth()+1)
+        .padStart(2,"0");
+
+    const dd =
+        String(d.getDate())
+        .padStart(2,"0");
+
+
+    return `${yyyy}/${mm}/${dd}`;
 
 }
 
 
-function resetIfNewDay(){
+async function checkTodayStatus(){
 
     const today = getToday();
 
-    if(happyData.date !== today){
 
-        happyData = {
-            date: today,
-            count: 0,
-            task: null,
-            category: null,
-            completed: false
-        };
+    if(appStatus.today !== today){
 
-        saveData();
 
-        clearTask();
+        await updateStatus({
+
+            today: today,
+
+            currentTask: "",
+
+            category: "",
+
+            todayComplete: 0,
+
+            todayBonus: 0
+
+        });
+
+
+        // メモリ上の状態も更新
+        appStatus.today =
+            today;
+
+        appStatus.currentTask =
+            "";
+
+        appStatus.category =
+            "";
+
+        appStatus.todayComplete =
+            0;
+
+        appStatus.todayBonus =
+            0;
+
+
     }
 
 }
@@ -192,7 +195,7 @@ function resetIfNewDay(){
 function updateMeter(){
 
     todayCount.textContent =
-    todaySummary.todayComplete;
+    appStatus.todayComplete;
 
     const eggs = [
         meterEgg1,
@@ -202,7 +205,7 @@ function updateMeter(){
 
     eggs.forEach((egg,index)=>{
 
-        if(index < todaySummary.todayComplete){
+        if(index < appStatus.todayComplete){
             egg.src = "img/egg.svg";
         }
         else{
@@ -212,7 +215,7 @@ function updateMeter(){
     });
 
 
-    if(todaySummary.todayComplete >= MAX_COUNT){
+    if(appStatus.todayComplete >= MAX_COUNT){
 
         drawButton.disabled = true;
 
@@ -229,16 +232,13 @@ function updateMeter(){
    タスク復元
 =================================== */
 
-function restoreTask(){
+function restoreTask(summary){
 
-    if(
-        happyData.task &&
-        !happyData.completed
-    ){
+    if(summary.currentTask){
 
         showTask(
-            happyData.category,
-            happyData.task
+            summary.category,
+            summary.currentTask
         );
 
     }
@@ -344,7 +344,7 @@ const GAS_URL = "https://script.google.com/macros/s/AKfycbwv7t2m-gQ046f_m0b4cZ4I
 
 drawButton.addEventListener("click", async()=>{
 
-    if(todaySummary.todayComplete >= MAX_COUNT){
+    if(appStatus.todayComplete >= MAX_COUNT){
 
         setMessage(
             "今日はもう3回達成しています✨"
@@ -383,19 +383,20 @@ drawButton.addEventListener("click", async()=>{
 
         }
 
+        await updateStatus({
 
-        happyData.task =
+            currentTask:data.task,
+
+            category:data.category
+
+        });
+        
+        // メモリ上の状態も更新
+        appStatus.currentTask =
             data.task;
 
-        happyData.category =
+        appStatus.category =
             data.category;
-
-        happyData.completed =
-            false;
-
-
-        saveData();
-
 
         showTask(
             data.category,
@@ -526,73 +527,80 @@ async function getSummary(){
    成長ステータス更新
 =================================== */
 
-function updateGrowth(summary){
+function updateGrowth(status){
 
 
-    const weekEggCount =
-        summary.weekComplete
+    const weekPoint =
+        status.weekComplete
         +
-        summary.weekBonus;
+        status.weekBonus;
 
 
-    const totalEggCount =
-        summary.totalComplete
+    const totalPoint =
+        status.totalComplete
         +
-        summary.totalBonus;
+        status.totalBonus;
 
 
 
     weekEgg.textContent =
-        weekEggCount + "個";
+        status.weekDays
+        + "日 "
+        + weekPoint
+        + "ポイント";
 
 
     totalEgg.textContent =
-        totalEggCount + "個";
+        status.totalDays
+        + "日 "
+        + totalPoint
+        + "ポイント";
 
 
     bonusCount.textContent =
-        summary.totalBonus + "回";
+        status.totalBonus
+        + "回";
 
 
-    updateEggLevel(totalEggCount);
+    updateEggLevel(totalPoint);
 
 }
 
-function updateEggLevel(total){
+function updateEggLevel(totalPoint){
 
 
     let level;
     let next;
 
 
-    if(total < 10){
+    if(totalPoint < 10){
 
         level = "🥚 たまご";
-        next = 10 - total;
+        next = 10 - totalPoint;
 
     }
-    else if(total < 50){
+    else if(totalPoint < 50){
 
         level = "🐣 ピヨピヨ";
-        next = 50 - total;
+        next = 50 - totalPoint;
 
     }
-    else if(total < 150){
+    else if(totalPoint < 150){
 
         level = "🐥 ひよっこ";
-        next = 150 - total;
+        next = 150 - totalPoint;
 
     }
-    else if(total < 300){
+    else if(totalPoint < 300){
 
         level = "🐤 立派なひよこ";
-        next = 300 - total;
+        next = 300 - totalPoint;
 
     }
-    else if(total < 500){
+    else if(totalPoint < 500){
 
         level = "🕊️ 羽ばたき";
-        next = 500 - total;
+        next = 500 - totalPoint;
 
     }
     else{
@@ -682,13 +690,13 @@ async function saveResult(bonus){
                 .slice(0,10),
 
         category:
-            happyData.category,
+            appStatus.category,
 
         task:
-            happyData.task,
+            appStatus.currentTask,
 
         count:
-            happyData.count + 1,
+            appStatus.todayComplete + 1,
 
         bonus:
             bonus,
@@ -703,14 +711,13 @@ async function saveResult(bonus){
 
         await postLog(logData);
 
-        happyData.completed = true;
 
-        happyData.task = null;
+        await updateStatus({
 
-        happyData.category = null;
+            currentTask:"",
+            category:""
 
-
-        saveData();
+        });
 
 
         updateMeter();
@@ -722,11 +729,11 @@ async function saveResult(bonus){
             const summary =
                 await getSummary();
 
-            todaySummary = summary;
+            appStatus = summary;
 
             updateMeter();
 
-            updateGrowth(summary);
+            updateGrowth(appStatus);
 
         }
         catch(error){
@@ -745,7 +752,7 @@ async function saveResult(bonus){
 
         comment.value = "";
 
-        if(todaySummary.todayComplete >= MAX_COUNT){
+        if(appStatus.todayComplete >= MAX_COUNT){
 
             setMessage(
                 "今日のたまごを全部達成しました🎉"
@@ -775,9 +782,10 @@ async function saveResult(bonus){
     }
 
 
-    completeButton.disabled = false;
-
-    bonusButton.disabled = false;
+    if(appStatus.currentTask){
+        completeButton.disabled = false;
+        bonusButton.disabled = false;
+    }
 
 
 }
