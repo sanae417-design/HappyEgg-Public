@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 120" width="100%" height="100%">
+  <!-- 背景のキラキラ（しあわせオーラ） -->
+  <circle cx="50" cy="60" r="25" fill="#FFF7C2" opacity="0.6" />
+  <!-- 上半分の殻 -->
+  <path d="M50,10 C20,10 10,60 10,65 L30,55 L50,65 L70,55 L90,65 C90,60 80,10 50,10 Z" fill="#FFF2CC" stroke="#D6B656" stroke-width="3"/>
+  <!-- 下半分の殻 -->
+  <path d="M10,65 L30,55 L50,65 L70,55 L90,65 C90,85 82,115 50,115 C18,115 10,85 10,65 Z" fill="#FFF2CC" stroke="#D6B656" stroke-width="3"/>
+</svg>
