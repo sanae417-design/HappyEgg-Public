@@ -100,6 +100,9 @@ window.addEventListener("DOMContentLoaded", async()=>{
 
         restoreTask(appStatus);
 
+console.log("updateMeter");
+console.log(appStatus);
+console.log(appStatus.todayComplete);
 
         updateMeter();
 
@@ -158,10 +161,6 @@ async function checkTodayStatus(){
             currentTask: "",
 
             category: "",
-
-            todayComplete: 0,
-
-            todayBonus: 0
 
         });
 
