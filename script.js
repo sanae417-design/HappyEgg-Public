@@ -103,6 +103,8 @@ window.addEventListener("DOMContentLoaded", async()=>{
         const summary =
             await getSummary();
 
+        console.log(summary);
+        
         todaySummary = summary;
 
         updateMeter();
@@ -199,7 +201,7 @@ function updateMeter(){
 
     eggs.forEach((egg,index)=>{
 
-        if(index < happyData.count){
+        if(index < todaySummary.todayComplete){
             egg.src = "img/egg.svg";
         }
         else{
@@ -341,7 +343,7 @@ const GAS_URL = "https://script.google.com/macros/s/AKfycbwv7t2m-gQ046f_m0b4cZ4I
 
 drawButton.addEventListener("click", async()=>{
 
-    if(happyData.count >= MAX_COUNT){
+    if(todaySummary.todayComplete >= MAX_COUNT){
 
         setMessage(
             "今日はもう3回達成しています✨"
@@ -678,9 +680,9 @@ async function saveResult(bonus){
     const logData = {
 
         date:
-            new Date().toLocaleString(
-                "ja-JP"
-            ),
+            new Date()
+                .toISOString()
+                .slice(0,10),
 
         category:
             happyData.category,
@@ -746,7 +748,7 @@ async function saveResult(bonus){
 
         comment.value = "";
 
-        if(happyData.count >= MAX_COUNT){
+        if(todaySummary.todayComplete >= MAX_COUNT){
 
             setMessage(
                 "今日のたまごを全部達成しました🎉"
