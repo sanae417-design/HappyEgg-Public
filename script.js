@@ -64,6 +64,14 @@ const nextLevel =
     document.getElementById("nextLevel");
     
 /* ===================================
+   当日データ
+=================================== */
+let todaySummary = {
+    todayComplete: 0,
+    todayBonus: 0
+};
+
+/* ===================================
    アプリデータ
 =================================== */
 
@@ -97,6 +105,12 @@ window.addEventListener("DOMContentLoaded", async ()=>{
 
         const summary =
             await getSummary();
+
+
+        todaySummary = summary;
+
+
+        updateMeter();
 
 
         updateGrowth(summary);
@@ -177,7 +191,8 @@ function resetIfNewDay(){
 
 function updateMeter(){
 
-    todayCount.textContent = happyData.count;
+    todayCount.textContent =
+    todaySummary.todayComplete;
 
     const eggs = [
         meterEgg1,
@@ -197,7 +212,7 @@ function updateMeter(){
     });
 
 
-    if(happyData.count >= MAX_COUNT){
+    if(todaySummary.todayComplete >= MAX_COUNT){
 
         drawButton.disabled = true;
 
@@ -692,9 +707,6 @@ async function saveResult(bonus){
 
         await postLog(logData);
 
-
-        happyData.count++;
-
         happyData.completed = true;
 
         happyData.task = null;
@@ -714,6 +726,9 @@ async function saveResult(bonus){
             const summary =
                 await getSummary();
 
+            todaySummary = summary;
+
+            updateMeter();
 
             updateGrowth(summary);
 
