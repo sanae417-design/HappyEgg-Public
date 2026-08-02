@@ -1,0 +1,46 @@
+バージョン 1（2026/08/01 15:15）
+デプロイ ID
+AKfycbwv7t2m-gQ046f_m0b4cZ4ISkhQH-YfJ7mqoy6M9Zd4y8h-Dx2hbHV_CjpHcZyUcffa
+ウェブアプリ
+URL
+https://script.google.com/macros/s/AKfycbwv7t2m-gQ046f_m0b4cZ4ISkhQH-YfJ7mqoy6M9Zd4y8h-Dx2hbHV_CjpHcZyUcffa/exec
+
+
+https://script.google.com/macros/s/AKfycbwv7t2m-gQ046f_m0b4cZ4ISkhQH-YfJ7mqoy6M9Zd4y8h-Dx2hbHV_CjpHcZyUcffa/exec
+
+
+ライブラリ
+https://script.google.com/macros/library/d/1Dv8qmUMpY-VKnmjNQySsHmCJnMntERneAVdjqOd_Livk_QnITuxHkvjQ/1
+
+
+localStorage.clear();
+
+
+
+
+バージョン 4（2026/08/02 7:52）
+デプロイ ID
+AKfycbwv7t2m-gQ046f_m0b4cZ4ISkhQH-YfJ7mqoy6M9Zd4y8h-Dx2hbHV_CjpHcZyUcffa
+ウェブアプリ
+URL
+https://script.google.com/macros/s/AKfycbwv7t2m-gQ046f_m0b4cZ4ISkhQH-YfJ7mqoy6M9Zd4y8h-Dx2hbHV_CjpHcZyUcffa/exec
+ライブラリ
+URL
+https://script.google.com/macros/library/d/1Dv8qmUMpY-VKnmjNQySsHmCJnMntERneAVdjqOd_Livk_QnITuxHkvjQ/4
+
+
+
+バージョン 3（2026/08/02 7:37）
+デプロイ ID
+AKfycbwv7t2m-gQ046f_m0b4cZ4ISkhQH-YfJ7mqoy6M9Zd4y8h-Dx2hbHV_CjpHcZyUcffa
+ウェブアプリ
+URL
+https://script.google.com/macros/s/AKfycbwv7t2m-gQ046f_m0b4cZ4ISkhQH-YfJ7mqoy6M9Zd4y8h-Dx2hbHV_CjpHcZyUcffa/exec
+
+
+https://script.google.com/macros/s/AKfycbwv7t2m-gQ046f_m0b4cZ4ISkhQH-YfJ7mqoy6M9Zd4y8h-Dx2hbHV_CjpHcZyUcffa/exec?action=summary
+
+
+ライブラリ
+URL
+https://script.google.com/macros/library/d/1Dv8qmUMpY-VKnmjNQySsHmCJnMntERneAVdjqOd_Livk_QnITuxHkvjQ/3

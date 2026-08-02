@@ -1,0 +1,355 @@
+<!-- 
+================================================================
+【HappyEgg】
+■ 概要：
+  ・Googleドライブのスプレッドシートからランダムでタスクを表示、1日3回
+  ・結果を記録する
+
+■ 構成：
+  /index.html          ：HTMLファイル
+  /style.css           ：CSSファイル（デザイン）
+  /script.js           ：JSファイル（スクリプトファイル）
+  /img/Sample.svg      ：画像フォルダ※SVGファイル
+
+ [OneDrive]
+
+   HappyEgg
+   │
+   ├ index.html
+   ├ style.css
+   ├ script.js
+   │
+   └ img
+      ├ egg.svg
+      ├ egg_gray.svg
+      └ egg_open.svg
+
+ [Google Drive]
+
+   HappyEggDataSheet
+   │
+   ├ List
+   ├ Logs
+   │
+   └ Apps Script
+         |
+         └ Code.gs https://script.google.com/macros/s/AKfycbwv7t2m-gQ046f_m0b4cZ4ISkhQH-YfJ7mqoy6M9Zd4y8h-Dx2hbHV_CjpHcZyUcffa/exec
+
+         
+■ID
+  id                  用途
+  todayCount          今日の回数（0～3）
+  meterEgg1～3        下部の3つのたまごメーター
+  mainEgg             真ん中の大きなたまご（開閉アニメーション用）
+  drawButton          抽選ボタン
+  taskArea            タスク表示エリア
+  taskCategory        カテゴリ表示
+  taskText            タスク表示
+  comment             コメント入力
+  completeButton      完了
+  bonusButton         上振れ完了
+  message             メッセージ表示
+  
+  
+■メモ
+
+＊テスト時の当日LocalStorageリセット
+  Consoleから
+  localStorage.clear() ※大文字小文字大事（Sのみ大文字）
+  
+＊Googleスプレッドシート
+  https://docs.google.com/spreadsheets/d/1QTNL2SHIvgID8GYWY6OK3TZ6Hyjua5BkG8wNMmR7ns4/edit?pli=1&gid=2115138908#gid=2115138908
+  
+================================================================
+-->
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>しあわせたまご</title>
+
+    <link rel="stylesheet" href="style.css">
+
+</head>
+
+<body>
+
+    <div class="container">
+
+        <!-- =========================
+             タイトル
+        ========================== -->
+
+        <header>
+
+            <h1>🥚 しあわせたまご</h1>
+
+            <p class="subTitle">
+                今日も小さな一歩を。
+            </p>
+
+        </header>
+
+
+
+        <!-- =========================
+             今日の達成度
+        ========================== -->
+
+        <section class="statusArea">
+
+            <div class="countText">
+
+                <span id="todayCount">0</span> / 3
+
+            </div>
+
+            <div class="eggMeter">
+
+                <img id="meterEgg1"
+                     src="img/egg_gray.svg"
+                     alt="egg">
+
+                <img id="meterEgg2"
+                     src="img/egg_gray.svg"
+                     alt="egg">
+
+                <img id="meterEgg3"
+                     src="img/egg_gray.svg"
+                     alt="egg">
+
+            </div>
+
+        </section>
+
+
+        <!-- =========================
+             抽選エリア
+        ========================== -->
+
+        <section class="drawArea">
+
+            <img id="mainEgg"
+                 class="mainEgg"
+                 src="img/egg.svg"
+                 alt="egg">
+
+            <button
+                id="drawButton"
+                class="drawButton">
+
+                しあわせたまご
+
+            </button>
+
+        </section>
+
+
+
+        <!-- =========================
+             タスク表示
+        ========================== -->
+
+        <section
+            id="taskArea"
+            class="taskArea hidden">
+
+            <div class="categoryLabel">
+
+                カテゴリ
+
+            </div>
+
+            <div
+                id="taskCategory"
+                class="taskCategory">
+
+                -
+
+            </div>
+
+            <div class="taskLabel">
+
+                今日のタスク
+
+            </div>
+
+            <div
+                id="taskText"
+                class="taskText">
+
+                -
+
+            </div>
+
+        </section>
+
+
+
+        <!-- =========================
+             コメント
+        ========================== -->
+
+        <section
+            id="commentArea"
+            class="commentArea hidden">
+
+            <label for="comment">
+
+                コメント
+
+            </label>
+
+            <textarea
+                id="comment"
+                maxlength="100"
+                placeholder="一言コメント（任意）"></textarea>
+
+            <div class="chipArea">
+
+                <button class="chip">
+                    がんばった！
+                </button>
+
+                <button class="chip">
+                    気分転換できた
+                </button>
+
+                <button class="chip">
+                    意外とできた
+                </button>
+
+                <button class="chip">
+                    少し前進
+                </button>
+
+            </div>
+
+        </section>
+
+
+
+        <!-- =========================
+             完了ボタン
+        ========================== -->
+
+        <section
+            id="completeArea"
+            class="completeArea hidden">
+
+            <button
+                id="completeButton"
+                class="completeButton">
+
+                完了
+
+            </button>
+
+            <button
+                id="bonusButton"
+                class="bonusButton">
+
+                上振れ完了✨
+
+            </button>
+
+        </section>
+
+
+
+        <!-- =========================
+             メッセージ
+        ========================== -->
+
+        <section
+            id="messageArea"
+            class="messageArea">
+
+            <span id="message">
+
+                ボタンを押して今日のたまごを割ろう！
+
+            </span>
+
+        </section>
+
+
+
+        <!-- =========================
+             成長ステータス
+        ========================== -->
+
+        <section
+            id="growthArea"
+            class="growthArea">
+
+            <div class="growthItem">
+
+                🌱 今週
+
+                <span id="weekEgg">
+                    -- 個
+                </span>
+
+            </div>
+
+
+            <div class="growthItem">
+
+                🌳 累計
+
+                <span id="totalEgg">
+                    -- 個
+                </span>
+
+            </div>
+
+
+            <div class="growthItem">
+
+                ✨ たまごプラス
+
+                <span id="bonusCount">
+                    -- 回
+                </span>
+
+            </div>
+
+
+            <div class="growthItem">
+
+                🥚 現在
+
+                <span id="eggLevel">
+                    読み込み中...
+                </span>
+
+            </div>
+
+
+            <div class="growthItem">
+
+                🐣 次の成長まで
+
+                <span id="nextLevel">
+                    あと-- 個
+                </span>
+
+            </div>
+
+        </section>
+        
+
+    </div>
+
+
+
+    <script src="script.js"></script>
+
+</body>
+
+</html>
