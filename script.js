@@ -589,14 +589,14 @@ function updateGrowth(status){
 
     weekEgg.textContent =
         status.weekDays
-        + "日 "
+        + "日   "
         + weekPoint
         + "ポイント";
 
 
     totalEgg.textContent =
         status.totalDays
-        + "日 "
+        + "日   "
         + totalPoint
         + "ポイント";
 
@@ -729,9 +729,7 @@ async function saveResult(bonus){
     const logData = {
 
         date:
-            new Date()
-                .toISOString()
-                .slice(0,10),
+            new Date(),
 
         category:
             appStatus.category,
