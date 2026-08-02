@@ -141,7 +141,7 @@ function getToday(){
         .padStart(2,"0");
 
 
-    return `${yyyy}-${mm}-${dd}`;
+    return `${yyyy}/${mm}/${dd}`;
 
 }
 
@@ -589,14 +589,14 @@ function updateGrowth(status){
 
     weekEgg.textContent =
         status.weekDays
-        + "日   "
+        + "日  /  "
         + weekPoint
         + "ポイント";
 
 
     totalEgg.textContent =
         status.totalDays
-        + "日   "
+        + "日  /  "
         + totalPoint
         + "ポイント";
 
