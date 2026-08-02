@@ -141,7 +141,7 @@ function getToday(){
         .padStart(2,"0");
 
 
-    return `${yyyy}/${mm}/${dd}`;
+    return `${yyyy}-${mm}-${dd}`;
 
 }
 
